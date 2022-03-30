@@ -76,6 +76,7 @@ export function rssPlugin(opts: OptionsMeta | OptionsDefine): Plugin {
       // serve feed.xml on dev server
       server.middlewares.use((req, res, next) => {
         if (/feed\.xml$/.test(req.url ?? "")) {
+          console.log(renderedXML);
           const fileContent = Buffer.from(renderedXML, "utf8");
           const readStream = new stream.PassThrough();
           readStream.end(fileContent);

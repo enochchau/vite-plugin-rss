@@ -14,19 +14,21 @@
     "prettier": "^2.6.1",
     "rollup": "^2.70.1",
     "typescript": "^4.6.3",
-    "vite": "^2.8.6"
+    "vite": "^2.8.6",
+    "vite-plugin-inspect": "^0.4.3"
   },
   "packageManager": "yarn@3.2.0",
   "dependencies": {
     "xml-js": "^1.6.11"
   },
   "scripts": {
-    "test": "vite",
-    "test:build": "vite build",
-    "test:preview": "vite preview",
+    "dev": "vite",
+    "dev:build": "vite build",
+    "dev:preview": "vite preview",
     "build": "tsc",
     "lint": "eslint src/",
     "lint:fix": "eslint --fix src/",
-    "fmt": "prettier src/"
+    "fmt": "prettier src/ --write",
+    "prepublish": "yarn lint && yarn build"
   }
 }
