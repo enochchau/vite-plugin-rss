@@ -2,6 +2,16 @@
 
 Create an RSS feed from an SPA at bundle time.
 
+## Installation
+
+```
+yarn add -D vite-plugin-rss
+```
+
+```
+npm install -D vite-plugin-rss
+```
+
 ## Usage
 
 Plugin Options:
