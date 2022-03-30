@@ -4,11 +4,22 @@ Create an RSS feed from an SPA at bundle time.
 
 ## Usage
 
+Plugin Options:
+
+```typescript
+interface Options {
+  channel: Channel; // RSS channel xml config
+  fileName?: string; // RSS xml file output name, defaults to 'feed.xml'
+  mode: "meta" | "define"; // the mode to use for item generation
+  itmes?: Item[]; // statically defined items in 'define' mode
+}
+```
+
 This plugin can run in two modes: `'meta'` or `'define'`.
 
 ### `'define'` mode
 
-In `'define'` mode, you define your rss items in the configuration of the
+In `'define'` mode, you define your RSS items in the configuration of the
 plugin.
 
 ```typescript

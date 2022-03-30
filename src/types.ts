@@ -95,9 +95,9 @@ export interface Channel {
   pubDate?: Date;
   lastBuildDate?: Date;
   category?: string;
-  // "vite-plugin-rss";
+  // "vite-plugin-rss"
   generator?: boolean;
-  // "https://www.rssboard.org/rss-specification";
+  // "https://www.rssboard.org/rss-specification"
   docs?: boolean;
   cloud?: Cloud;
   ttl?: number;

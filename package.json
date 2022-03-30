@@ -6,6 +6,12 @@
   "files": [
     "dist/"
   ],
+  "keywords": [
+    "vite-plugin",
+    "xml",
+    "rss"
+  ],
+  "types": "dist/index.d.ts",
   "devDependencies": {
     "@types/node": "^17.0.23",
     "@typescript-eslint/eslint-plugin": "^5.17.0",
@@ -32,5 +38,14 @@
     "lint:fix": "eslint --fix src/",
     "fmt": "prettier src/ --write",
     "prepublish": "yarn lint && yarn build"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ec965/vite-plugin-rss.git"
+  },
+  "homepage": "https://github.com/ec965/vite-plugin-rss#readme",
+  "bugs": {
+    "url": "https://github.com/ec965/vite-plugin-rss/issues"
+  },
+  "author": "Enoch Chau (http://enochchau.com)"
 }
