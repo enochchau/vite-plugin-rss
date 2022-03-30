@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+
 import { rssPlugin } from "./src";
 
 export default defineConfig({
