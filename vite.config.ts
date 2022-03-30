@@ -1,10 +1,8 @@
 import { defineConfig } from "vite";
-import Inspect from "vite-plugin-inspect";
 import { rssPlugin } from "./src";
 
 export default defineConfig({
   plugins: [
-    Inspect(),
     rssPlugin({
       mode: "define",
       items: [

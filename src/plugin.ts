@@ -30,38 +30,7 @@ export function rssPlugin(opts: OptionsMeta | OptionsDefine): Plugin {
       }
       // maybe do another pass for validation w/ zod
 
-      // sort by pubDate if available
-      const dateSortedRssItems = items.sort((a, b) => {
-        if (a.pubDate && b.pubDate) {
-          return b.pubDate.getTime() - a.pubDate.getTime();
-        }
-        if (a.pubDate) {
-          return 1;
-        }
-        if (b.pubDate) {
-          return -1;
-        }
-        return 0;
-      });
-
-      // transform rssItems into xml
-      // transofmr channel description into xml
-      const jsXml = {
-        _declaration: { _attributes: { version: "1.0", encoding: "utf-8" } },
-        rss: {
-          _attributes: {
-            version: "2.0",
-            "xmlns:atom": "http://www.w3.org/2005/Atom",
-          },
-          channel: {
-            ...channelToXmlJs(opts.channel, fileName),
-            item: dateSortedRssItems.map((r) => itemToXmlJs(r)),
-          },
-        },
-      };
-
-      // turn collected items into xml
-      renderedXML = convert.js2xml(jsXml, { compact: true, spaces: 2 });
+      renderedXML = createRssFeed(opts.channel, items, fileName);
 
       // add to the bundle
       bundle[fileName] = {
@@ -75,8 +44,8 @@ export function rssPlugin(opts: OptionsMeta | OptionsDefine): Plugin {
     configureServer(server) {
       // serve feed.xml on dev server
       server.middlewares.use((req, res, next) => {
-        if (/feed\.xml$/.test(req.url ?? "")) {
-          console.log(renderedXML);
+        if (req.url?.includes(fileName)) {
+          renderedXML = createRssFeed(opts.channel, items, fileName);
           const fileContent = Buffer.from(renderedXML, "utf8");
           const readStream = new stream.PassThrough();
           readStream.end(fileContent);
@@ -90,6 +59,41 @@ export function rssPlugin(opts: OptionsMeta | OptionsDefine): Plugin {
       });
     },
   };
+}
+
+function createRssFeed(channel: Channel, items: Item[], fileName: string) {
+  // sort by pubDate if available
+  const dateSortedRssItems = items.sort((a, b) => {
+    if (a.pubDate && b.pubDate) {
+      return b.pubDate.getTime() - a.pubDate.getTime();
+    }
+    if (a.pubDate) {
+      return 1;
+    }
+    if (b.pubDate) {
+      return -1;
+    }
+    return 0;
+  });
+
+  // transform rssItems into xml
+  // transofmr channel description into xml
+  const jsXml = {
+    _declaration: { _attributes: { version: "1.0", encoding: "utf-8" } },
+    rss: {
+      _attributes: {
+        version: "2.0",
+        "xmlns:atom": "http://www.w3.org/2005/Atom",
+      },
+      channel: {
+        ...channelToXmlJs(channel, fileName),
+        item: dateSortedRssItems.map((r) => itemToXmlJs(r)),
+      },
+    },
+  };
+
+  // turn collected items into xml
+  return convert.js2xml(jsXml, { compact: true, spaces: 2 });
 }
 
 function channelToXmlJs(channel: Channel, fileName: string) {
