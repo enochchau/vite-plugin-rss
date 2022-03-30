@@ -4,6 +4,7 @@
   "main": "dist/index.js",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^17.0.23",
     "@typescript-eslint/eslint-plugin": "^5.17.0",
     "@typescript-eslint/parser": "^5.17.0",
     "eslint": "^8.12.0",
@@ -11,7 +12,21 @@
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "eslint-plugin-unused-imports": "^2.0.0",
     "prettier": "^2.6.1",
-    "typescript": "^4.6.3"
+    "rollup": "^2.70.1",
+    "typescript": "^4.6.3",
+    "vite": "^2.8.6"
   },
-  "packageManager": "yarn@3.2.0"
+  "packageManager": "yarn@3.2.0",
+  "dependencies": {
+    "xml-js": "^1.6.11"
+  },
+  "scripts": {
+    "test": "vite",
+    "test:build": "vite build",
+    "test:preview": "vite preview",
+    "build": "tsc",
+    "lint": "eslint src/",
+    "lint:fix": "eslint --fix src/",
+    "fmt": "prettier src/"
+  }
 }

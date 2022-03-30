@@ -1,0 +1,1 @@
+export { rssPlugin } from "./plugin";

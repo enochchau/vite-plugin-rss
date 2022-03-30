@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "outDir": "dist",
+    "target": "es2015",
     "lib": ["esnext"],
     "allowJs": true,
     "checkJs": true,
@@ -10,7 +11,7 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
