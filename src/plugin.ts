@@ -2,6 +2,7 @@ import { ModuleInfo } from "rollup";
 import stream from "stream";
 import { Plugin } from "vite";
 import convert, { ElementCompact } from "xml-js";
+
 import {
   isImage,
   isJsXmlElement,
