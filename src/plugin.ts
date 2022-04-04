@@ -138,7 +138,7 @@ function createRssFeed(channel: Channel, items: Item[], fileName: string) {
       },
       channel: {
         ...channelToXmlJs(channel, fileName),
-        item: dateSortedRssItems.map((r) => itemToXmlJs(r)),
+        item: dateSortedRssItems.map((r) => itemToXmlJs(r)).slice(0, 100),
       },
     },
   };
