@@ -15,38 +15,58 @@ import { Channel, Item, OptionsDefine, OptionsMeta } from "./types";
 export function rssPlugin(opts: OptionsMeta | OptionsDefine): Plugin {
   const fileName = opts.fileName ?? "feed.xml";
   let items: Item[];
-  let renderedXML = "";
   if (opts.mode === "define") {
     items = opts.items;
   }
 
   return {
     name: "rss-plugin",
-    generateBundle(_options, bundle) {
+    enforce: "post",
+    buildEnd() {
       if (!items && opts.mode === "meta") {
-        items = Array.from(this.getModuleIds())
-          .map((id) => this.getModuleInfo(id))
+        const moduleIds = Array.from(this.getModuleIds());
+        const moduleInfo = moduleIds.map((id) => this.getModuleInfo(id));
+        items = moduleInfo
           .filter((module): module is ModuleInfo => !!module?.meta.rssItem)
           .map((module) => module.meta.rssItem);
       }
       // maybe do another pass for validation w/ zod
 
-      renderedXML = createRssFeed(opts.channel, items, fileName);
+      const renderedXML = createRssFeed(opts.channel, items, fileName);
 
-      // add to the bundle
-      bundle[fileName] = {
+      this.emitFile({
         fileName: fileName,
         name: fileName,
         source: renderedXML,
         type: "asset",
-        isAsset: true,
-      };
+      });
     },
     configureServer(server) {
       // serve feed.xml on dev server
       server.middlewares.use((req, res, next) => {
-        if (req.url?.includes(fileName)) {
-          renderedXML = createRssFeed(opts.channel, items, fileName);
+        if (
+          typeof req.url === "string" &&
+          new RegExp(`${fileName}$`).test(req.url)
+        ) {
+          if (!items && opts.mode === "meta") {
+            const devServerModuleIds = Array.from(
+              server.moduleGraph.idToModuleMap.keys()
+            );
+            const moduleInfo = devServerModuleIds.map((id) =>
+              server.pluginContainer.getModuleInfo(id)
+            );
+
+            items = moduleInfo
+              .filter((module): module is ModuleInfo => !!module?.meta.rssItem)
+              .map((module) => module.meta.rssItem);
+          }
+
+          const renderedXML = createRssFeed(
+            opts.channel,
+            items ?? [],
+            fileName
+          );
+
           const fileContent = Buffer.from(renderedXML, "utf8");
           const readStream = new stream.PassThrough();
           readStream.end(fileContent);
