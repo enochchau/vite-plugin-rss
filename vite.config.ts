@@ -4,19 +4,16 @@ import { rssPlugin } from "./src";
 
 const metaTestPlugin: Plugin = {
   name: "meta-test-plugin",
-  transform(_code, id) {
-    if (id.includes("index")) {
-      return {
-        meta: {
-          rssItem: {
-            title: "Second Post",
-            link: "http://lvh.me:3000/test/2",
-            pubDate: new Date("1/1/2000"),
-          },
+  transform(_code, _id) {
+    return {
+      meta: {
+        rssItem: {
+          title: "Second Post",
+          link: "http://lvh.me:3000/test/2",
+          pubDate: new Date("1/1/2000"),
         },
-      };
-    }
-    return null;
+      },
+    };
   },
 };
 
@@ -30,7 +27,6 @@ export default defineConfig({
         link: "http://lvh.me:3000",
         description: "Test rss feed for vite-plugin-rss.",
       },
-      fileName: "meta.xml",
     }),
     // rssPlugin({
     //   mode: "define",
@@ -51,7 +47,6 @@ export default defineConfig({
     //     link: "http://lvh.me:3000",
     //     description: "Test rss feed for vite-plugin-rss.",
     //   },
-    //   fileName: "define.xml",
     // }),
   ],
   build: {

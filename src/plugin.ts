@@ -1,6 +1,6 @@
 import { ModuleInfo } from "rollup";
 import stream from "stream";
-import { ConfigEnv, Plugin } from "vite";
+import { Plugin } from "vite";
 import convert, { ElementCompact } from "xml-js";
 
 import {
@@ -12,39 +12,22 @@ import {
 } from "./type-guards";
 import { Channel, Item, OptionsDefine, OptionsMeta } from "./types";
 
-export function rssPlugin(opts: OptionsMeta | OptionsDefine): Plugin {
+export function rssPlugin(opts: OptionsMeta | OptionsDefine): Plugin[] {
+  return [devPlugin(opts), buildPlugin(opts)];
+}
+
+/**
+ * dev mode plugin to serve the xml file
+ * @param opts - plugin config options
+ */
+function devPlugin(opts: OptionsMeta | OptionsDefine): Plugin {
   let items = getItems(opts);
   const fileName = getFileName(opts);
-  let mode: ConfigEnv["command"];
 
   return {
-    name: "vite-rss-plugin",
+    name: "rss-plugin-dev",
     enforce: "post",
-    apply(_config, env) {
-      mode = env.command;
-      return true;
-    },
-    buildEnd() {
-      if (!items && opts.mode === "meta") {
-        const moduleIds = Array.from(this.getModuleIds());
-        const moduleInfo = moduleIds.map((id) => this.getModuleInfo(id));
-        items = moduleInfo
-          .filter((module): module is ModuleInfo => !!module?.meta.rssItem)
-          .map((module) => module.meta.rssItem);
-      }
-      // maybe do another pass for validation w/ zod
-
-      const renderedXML = createRssFeed(opts.channel, items, fileName);
-
-      if (mode !== "serve") {
-        this.emitFile({
-          fileName: fileName,
-          name: fileName,
-          source: renderedXML,
-          type: "asset",
-        });
-      }
-    },
+    apply: "serve",
     configureServer(server) {
       // serve feed.xml on dev server
       server.middlewares.use((req, res, next) => {
@@ -52,7 +35,7 @@ export function rssPlugin(opts: OptionsMeta | OptionsDefine): Plugin {
           typeof req.url === "string" &&
           new RegExp(`${fileName}$`).test(req.url)
         ) {
-          if (!items && opts.mode === "meta") {
+          if (opts.mode === "meta") {
             const devServerModuleIds = Array.from(
               server.moduleGraph.idToModuleMap.keys()
             );
@@ -81,6 +64,40 @@ export function rssPlugin(opts: OptionsMeta | OptionsDefine): Plugin {
           return;
         }
         next();
+      });
+    },
+  };
+}
+
+/**
+ * build mode plugin for production builds
+ * @param opts - plugin options
+ */
+function buildPlugin(opts: OptionsMeta | OptionsDefine): Plugin {
+  let items = getItems(opts);
+  const fileName = getFileName(opts);
+
+  return {
+    name: "rss-plugin-build",
+    enforce: "post",
+    apply: "build",
+    buildEnd() {
+      if (opts.mode === "meta") {
+        const moduleIds = Array.from(this.getModuleIds());
+        const moduleInfo = moduleIds.map((id) => this.getModuleInfo(id));
+        items = moduleInfo
+          .filter((module): module is ModuleInfo => !!module?.meta.rssItem)
+          .map((module) => module.meta.rssItem);
+      }
+      // maybe do another pass for validation w/ zod
+
+      const renderedXML = createRssFeed(opts.channel, items, fileName);
+
+      this.emitFile({
+        fileName: fileName,
+        name: fileName,
+        source: renderedXML,
+        type: "asset",
       });
     },
   };
