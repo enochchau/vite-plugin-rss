@@ -5,7 +5,7 @@ import { rssPlugin } from "./src";
 const metaTestPlugin: Plugin = {
   name: "meta-test-plugin",
   transform(_code, id) {
-    if (id.includes("index.ts")) {
+    if (id.includes("index")) {
       return {
         meta: {
           rssItem: {

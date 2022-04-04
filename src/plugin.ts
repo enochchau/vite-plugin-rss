@@ -1,6 +1,6 @@
 import { ModuleInfo } from "rollup";
 import stream from "stream";
-import { Plugin } from "vite";
+import { ConfigEnv, Plugin } from "vite";
 import convert, { ElementCompact } from "xml-js";
 
 import {
@@ -13,15 +13,17 @@ import {
 import { Channel, Item, OptionsDefine, OptionsMeta } from "./types";
 
 export function rssPlugin(opts: OptionsMeta | OptionsDefine): Plugin {
-  const fileName = opts.fileName ?? "feed.xml";
-  let items: Item[];
-  if (opts.mode === "define") {
-    items = opts.items;
-  }
+  let items = getItems(opts);
+  const fileName = getFileName(opts);
+  let mode: ConfigEnv["command"];
 
   return {
-    name: "rss-plugin",
+    name: "vite-rss-plugin",
     enforce: "post",
+    apply(_config, env) {
+      mode = env.command;
+      return true;
+    },
     buildEnd() {
       if (!items && opts.mode === "meta") {
         const moduleIds = Array.from(this.getModuleIds());
@@ -34,12 +36,14 @@ export function rssPlugin(opts: OptionsMeta | OptionsDefine): Plugin {
 
       const renderedXML = createRssFeed(opts.channel, items, fileName);
 
-      this.emitFile({
-        fileName: fileName,
-        name: fileName,
-        source: renderedXML,
-        type: "asset",
-      });
+      if (mode !== "serve") {
+        this.emitFile({
+          fileName: fileName,
+          name: fileName,
+          source: renderedXML,
+          type: "asset",
+        });
+      }
     },
     configureServer(server) {
       // serve feed.xml on dev server
@@ -80,6 +84,15 @@ export function rssPlugin(opts: OptionsMeta | OptionsDefine): Plugin {
       });
     },
   };
+}
+
+function getFileName(opts: OptionsMeta | OptionsDefine): string {
+  return opts.fileName ?? "feed.xml";
+}
+
+function getItems(opts: OptionsMeta | OptionsDefine): Item[] {
+  if (opts.mode === "define") return opts.items;
+  return [];
 }
 
 function createRssFeed(channel: Channel, items: Item[], fileName: string) {
