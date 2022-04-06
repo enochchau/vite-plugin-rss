@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "dist/",
     "target": "es2015",
     "lib": ["esnext"],
     "allowJs": true,
@@ -15,8 +15,9 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "declaration": true
+    "sourceMap": true,
+    "declaration": true,
+    "noEmit": true
   },
-
   "include": ["src"]
 }

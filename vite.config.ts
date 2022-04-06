@@ -1,6 +1,6 @@
 import { defineConfig, Plugin } from "vite";
 
-import { rssPlugin } from "./src";
+import { rssPlugin } from "./dist/index";
 
 const metaTestPlugin: Plugin = {
   name: "meta-test-plugin",
